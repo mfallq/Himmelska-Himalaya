@@ -73,8 +73,8 @@
 :root[data-theme="light"] {
   --bg: #f3eee4; --bg-2: #ece6d9; --surface: #fbf8f1; --surface-2: #f1ebdf;
   --line: rgba(32, 40, 44, .14); --line-strong: rgba(32, 40, 44, .3);
-  --fg: #1a2428; --fg-2: #48555a; --fg-3: #75817f;
-  --accent: #a4640d; --accent-ink: #fff8ea; --accent-soft: rgba(164, 100, 13, .12);
+  --fg: #1a2428; --fg-2: #48555a; --fg-3: #5f6b69;
+  --accent: #94590a; --accent-ink: #fff8ea; --accent-soft: rgba(164, 100, 13, .12);
   --ice: #1f7f78; --warn: #b8492e; --ok: #2f7d43;
   --shadow: 0 16px 40px rgba(60, 50, 30, .16);
   color-scheme: light;
@@ -83,8 +83,8 @@
   :root[data-theme="auto"] {
     --bg: #f3eee4; --bg-2: #ece6d9; --surface: #fbf8f1; --surface-2: #f1ebdf;
     --line: rgba(32, 40, 44, .14); --line-strong: rgba(32, 40, 44, .3);
-    --fg: #1a2428; --fg-2: #48555a; --fg-3: #75817f;
-    --accent: #a4640d; --accent-ink: #fff8ea; --accent-soft: rgba(164, 100, 13, .12);
+    --fg: #1a2428; --fg-2: #48555a; --fg-3: #5f6b69;
+    --accent: #94590a; --accent-ink: #fff8ea; --accent-soft: rgba(164, 100, 13, .12);
     --ice: #1f7f78; --warn: #b8492e; --ok: #2f7d43;
     --shadow: 0 16px 40px rgba(60, 50, 30, .16);
     color-scheme: light;
@@ -542,9 +542,6 @@ dialog::backdrop { background: rgba(4, 8, 11, .68); backdrop-filter: blur(3px); 
   animation: sheetIn .45s var(--ease); overscroll-behavior: contain;
 }
 @keyframes sheetIn { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
-.sheet-grab { position: sticky; top: 0; z-index: 3; height: 22px; display: grid; place-items: center; background: linear-gradient(var(--bg-2), transparent); }
-.sheet-grab::before { content: ""; width: 44px; height: 4px; border-radius: 4px; background: var(--line-strong); }
-.sheet-close { position: sticky; top: 14px; z-index: 4; float: right; margin: 0 22px 0 0; }
 .sheet-body { padding: 8px clamp(18px, 3.4vw, 40px) 60px; display: grid; gap: 34px; }
 .sheet-body > section { display: grid; gap: 16px; scroll-margin-top: 20px; }
 .sheet-title { font: 400 clamp(28px, 3.6vw, 42px)/1.1 var(--serif); max-width: 22ch; text-wrap: balance; }
@@ -595,7 +592,7 @@ dialog::backdrop { background: rgba(4, 8, 11, .68); backdrop-filter: blur(3px); 
   .hero .hero-shade { background: linear-gradient(0deg, rgba(7, 13, 18, .9) 0%, transparent 40%); height: 56vh; min-height: 340px; }
   .hero-ui { position: static; display: grid; gap: 14px; padding: 0 16px 22px; }
   .hero-copy, .daypanel, .relief-controls, .flightcard, .credit, .frame-all, .hero-tools, .hint { position: static; transform: none; width: auto; max-width: none; }
-  .hero-copy { margin-top: -74px; position: relative; }
+  .hero-copy { margin-top: -74px; position: relative; top: auto; left: auto; }
   .daychip { top: 14px; left: 16px; }
   .relief-controls { justify-items: stretch; }
   .relief-controls .row { justify-content: space-between; }
@@ -639,7 +636,7 @@ main { padding-top: calc(var(--topbar-h) + var(--safe-top)); }
   /* iOS zooms the page when a focused field is smaller than 16px */
   .field, select.field, textarea.field, input.field { font-size: 16px; }
   .hero canvas.gl, .hero .hero-shade, .labels { height: 52svh; min-height: 320px; }
-  .hero-copy { margin-top: -34px; }
+  .hero-copy { margin-top: 10px; }
   .hero-copy .display { font-size: clamp(40px, 12vw, 54px); }
   .display { font-size: clamp(38px, 11.5vw, 54px); }
   .daychip { top: 12px; left: 12px; padding: 9px 12px; }
@@ -664,8 +661,6 @@ main { padding-top: calc(var(--topbar-h) + var(--safe-top)); }
   .kv { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .viewfig canvas { aspect-ratio: 16 / 10; }
   .modal[open] { padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px)); }
-  .chart svg { min-width: 560px; }
-  .chart { overflow-x: auto; }
   #toast { bottom: calc(var(--tabbar-h) + 26px + env(safe-area-inset-bottom)); }
 }
 /* Running from the Home Screen: nothing to scroll sideways, no rubber band. */
@@ -674,7 +669,23 @@ main { padding-top: calc(var(--topbar-h) + var(--safe-top)); }
   input, textarea, p, li, dd, h1, h2, h3, h4 { -webkit-user-select: text; user-select: text; }
 }
 @media (max-width: 760px) {
-  /* The floating Close button squeezed the text column on phones. */
-  .sheet-close { float: none; display: flex; margin: 0 16px 0 auto; }
   .sheet-title { max-width: none; }
+}
+
+/* ---------- 10. Release 1: day sheet bar, narrow charts, touch ---------- */
+.sheet-bar {
+  position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 6px;
+  padding: 8px 12px 8px 18px; background: var(--bg-2); border-bottom: 1px solid var(--line);
+}
+.sheet-bar .sheet-pos { margin-right: auto; font: 600 12px/1.2 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--fg-2); }
+.sheet-bar .btn { min-height: 44px; min-width: 44px; padding: 0 12px; }
+.sheet-body { padding-top: 20px; }
+.chart.narrow .axis { font-size: 17px; }
+.chart.narrow .tag { font-size: 16px; }
+@media (pointer: coarse) {
+  .topbtn { min-width: 44px; height: 44px; justify-content: center; }
+  .btn-sm, .linkbtn, .seg button, .pill { min-height: 44px; }
+  .pill.icon { width: 44px; }
+  .brand { min-height: 44px; }
+  details.fold > summary { min-height: 48px; align-items: center; }
 }

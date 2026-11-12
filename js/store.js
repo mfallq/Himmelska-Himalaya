@@ -6,7 +6,8 @@ const defaults = {
   settings: { startDate: '', theme: 'auto', home: '' },
   checks: {}, // checklist item id -> true
   journal: {}, // day number -> { note, check: { headache, stomach, fatigue, dizzy } }
-  relief: { exaggeration: 1.4, mode: 'cinema', labels: true, photo: true, orbit: true },
+  // The slow orbit keeps the GPU busy: off by default on phones to save battery.
+  relief: { exaggeration: 1.4, mode: 'cinema', labels: true, photo: true, orbit: !(typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches) },
 };
 
 function load() {

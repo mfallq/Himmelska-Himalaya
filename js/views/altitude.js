@@ -9,8 +9,8 @@ import { openDay } from './daysheet.js';
 export const pressure = (m) => (1 - 2.25577e-5 * m) ** 5.25588;
 
 // ---- chart 1: where you sleep, day by day ----
-function sleepChart(selected) {
-  const W = 1000, H = 420, L = 64, R = 24, T = 28, B = 52, MAX = 6000;
+function sleepChart(selected, narrow) {
+  const W = narrow ? 520 : 1000, H = narrow ? 480 : 420, L = narrow ? 52 : 64, R = narrow ? 14 : 24, T = 28, B = 52, MAX = 6000;
   const x = (n) => L + ((n - 1) / (TRIP.days - 1)) * (W - L - R);
   const y = (m) => T + (1 - m / MAX) * (H - T - B);
   const pts = DAYS.map((d) => `${x(d.n).toFixed(1)},${y(d.sleep).toFixed(1)}`);
@@ -34,10 +34,10 @@ function sleepChart(selected) {
 }
 
 // ---- chart 2: the trail itself, by distance ----
-function profileChart(selected) {
+function profileChart(selected, narrow) {
   const t = data.track;
   if (!t.length) return '';
-  const W = 1000, H = 300, L = 64, R = 24, T = 22, B = 46, MAX = 6000, MIN = 500;
+  const W = narrow ? 520 : 1000, H = narrow ? 380 : 300, L = narrow ? 52 : 64, R = narrow ? 14 : 24, T = 22, B = 46, MAX = 6000, MIN = 500;
   const x = (km) => L + (km / data.trackKm) * (W - L - R);
   const y = (m) => T + (1 - (m - MIN) / (MAX - MIN)) * (H - T - B);
   const step = Math.max(1, Math.floor(t.length / 700));
@@ -86,6 +86,7 @@ export async function mount(root) {
     const n = store.state.day, d = DAYS[n - 1], date = dateOf(n);
     const p = pressure(d.sleep), pHigh = pressure(d.high);
     const C = 2 * Math.PI * 50;
+    const narrow = matchMedia('(max-width: 760px)').matches;
     root.innerHTML = html`
       <div class="wrap">
         <section class="section">
@@ -96,12 +97,12 @@ export async function mount(root) {
           </div>
           <div class="card chartcard">
             <header><h2 class="h3">Day ${n}${date ? ' · ' + dateShort(date) : ''}</h2><span class="chip">${STOPS[d.to].name} · ${metres(d.sleep)}</span></header>
-            <div class="chart" id="a-sleep">${sleepChart(n)}</div>
+            <div class="chart${narrow ? ' narrow' : ''}" id="a-sleep">${sleepChart(n, narrow)}</div>
             <div class="legend"><span><i></i>Sleeping altitude</span><span><i class="dash"></i>Highest point of the day</span></div>
           </div>
           <div class="card chartcard" style="margin-top:16px">
             <header><h2 class="h3">The walk in profile</h2><span class="chip">${Math.round(data.trackKm)} km · Jagat to Nayapul</span></header>
-            <div class="chart" id="a-profile">${profileChart(n)}</div>
+            <div class="chart${narrow ? ' narrow' : ''}" id="a-profile">${profileChart(n, narrow)}</div>
             <p class="small faint" style="margin-top:8px">Walking days only, by distance along the mapped trail. Heights are pinned to the published altitude of each village, with the shape in between taken from an elevation model, so treat small bumps as approximate. The drop between days 13 and 14 is the road down the Kali Gandaki.</p>
           </div>
         </section>
@@ -154,6 +155,7 @@ export async function mount(root) {
     else store.set('day', n);
   });
   draw();
+  matchMedia('(max-width: 760px)').addEventListener('change', draw);
   store.on('day', draw);
   store.on('settings', draw);
 }

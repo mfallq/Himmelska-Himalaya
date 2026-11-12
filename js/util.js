@@ -66,7 +66,8 @@ export const feet = (m) => `${nf.format(Math.round((m * 3.28084) / 10) * 10)} ft
 export const num = (n) => nf.format(n);
 
 const DAY_MS = 86400000;
-export const addDays = (date, n) => new Date(date.getTime() + n * DAY_MS);
+// By calendar date, so a clock change in between does not move the day.
+export const addDays = (date, n) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + n);
 export const parseISO = (iso) => {
   if (!iso) return null;
   const [y, m, d] = iso.split('-').map(Number);

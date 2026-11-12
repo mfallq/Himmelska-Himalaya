@@ -11,6 +11,9 @@
   ExpiresActive Off
 </IfModule>
 <IfModule mod_headers.c>
+  # The main site blocks location for every page. "Where am I" needs it here,
+  # for this folder only. The position stays on the phone.
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(), usb=(), interest-cohort=()"
   <FilesMatch "\.(html|css|js|json|webmanifest)$">
     Header set Cache-Control "no-cache"
   </FilesMatch>

@@ -1,28 +1,55 @@
-// Service worker: keeps a full copy of the site on the device.
+// Service worker: keeps one complete copy of the site on the device.
 //
-// Built for use with no signal or a very weak one: every request is answered
-// from the saved copy at once, and the network is only used in the background
-// to refresh that copy for the next visit. Nothing ever waits on the network
-// once the site has been saved.
-const CACHE = 'hh-site-v2';
+// Built for use with no signal: every request is answered from the saved copy
+// at once. A new version is downloaded whole into its own cache and only takes
+// over when every file has arrived, so the site is never half old and half new.
+// If anything fails, the old version keeps running.
+const VERSION = '4a54b1c9b366';
+const PREFIX = 'hh-site-';
+const CACHE = PREFIX + VERSION;
 
-async function saveAll() {
-  const res = await fetch('precache.json', { cache: 'no-store' });
-  const manifest = await res.json();
+async function install() {
+  const manifest = await (await fetch('precache.json?net=' + Date.now(), { cache: 'no-store' })).json();
+  // Start from nothing, so a half-finished earlier try can never leave a stale file behind.
+  await caches.delete(CACHE);
   const cache = await caches.open(CACHE);
-  // One missing file must not stop the rest from being saved.
-  await Promise.allSettled(manifest.files.map((url) => cache.add(new Request(url, { cache: 'reload' }))));
+  const queue = [...manifest.files];
+  const work = async () => {
+    for (let f; (f = queue.shift()); ) {
+      const res = await fetch(new Request(f.url, { cache: 'reload' }));
+      if (!res.ok) throw new Error(`${f.url}: ${res.status}`);
+      await cache.put(f.url, res);
+    }
+  };
+  await Promise.all([work(), work(), work(), work()]);
+  // The satellite picture is not in the list: carry over the one this device has.
+  for (const name of await caches.keys()) {
+    if (!name.startsWith(PREFIX) || name === CACHE) continue;
+    const old = await caches.open(name);
+    for (const url of ['assets/terrain/satellite.jpg', 'assets/terrain/satellite-small.jpg']) {
+      const hit = await old.match(url);
+      if (hit && !(await cache.match(url))) await cache.put(url, hit);
+    }
+  }
+  // Written last: its presence marks the copy as complete.
   await cache.put('precache.json', new Response(JSON.stringify(manifest), { headers: { 'Content-Type': 'application/json' } }));
 }
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(saveAll().then(() => self.skipWaiting()));
+  event.waitUntil(
+    install()
+      .then(() => self.skipWaiting())
+      .catch(async (err) => {
+        await caches.delete(CACHE);
+        throw err;
+      }),
+  );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      for (const name of await caches.keys()) if (name !== CACHE) await caches.delete(name);
+      for (const name of await caches.keys()) if (name.startsWith(PREFIX) && name !== CACHE) await caches.delete(name);
       await self.clients.claim();
     })(),
   );
@@ -30,23 +57,19 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== location.origin || url.searchParams.has('net')) return;
   event.respondWith(
     (async () => {
       const cache = await caches.open(CACHE);
       const hit = await cache.match(req, { ignoreSearch: true });
-      const refresh = fetch(req)
-        .then((res) => {
-          if (res.ok) cache.put(req, res.clone());
-          return res;
-        })
-        .catch(() => null);
-      if (hit) {
-        event.waitUntil(refresh);
-        return hit;
-      }
+      if (hit) return hit;
       // Not saved: use the network, and offline fall back to the start page.
-      return (await refresh) || (req.mode === 'navigate' && (await cache.match('./'))) || new Response('Offline, and this file was not saved yet.', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+      try {
+        return await fetch(req);
+      } catch {
+        return (req.mode === 'navigate' && (await cache.match('./'))) || new Response('Offline, and this file was not saved yet.', { status: 503, headers: { 'Content-Type': 'text/plain' } });
+      }
     })(),
   );
 });

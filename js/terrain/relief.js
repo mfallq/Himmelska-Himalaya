@@ -138,7 +138,20 @@ export class Relief {
     this._controls();
     this._observer = new ResizeObserver(() => this.invalidate());
     this._observer.observe(canvas);
-    canvas.addEventListener('webglcontextlost', (e) => e.preventDefault());
+    // iOS drops the context of apps in the background. Rebuild everything when it returns.
+    this._lost = false;
+    canvas.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      this._lost = true;
+    });
+    canvas.addEventListener('webglcontextrestored', () => {
+      this._program();
+      this._mesh();
+      this._textures();
+      if (this._source) this.setTexture(this._source);
+      this._lost = false;
+      this.invalidate();
+    });
     this._loop = this._loop.bind(this);
     this._raf = requestAnimationFrame(this._loop);
   }
@@ -215,6 +228,8 @@ export class Relief {
 
   /** Replace the ground texture with a canvas or image covering the whole grid. */
   setTexture(source) {
+    this._source = source;
+    if (this._lost) return;
     const gl = this.gl;
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.albedo);
@@ -394,7 +409,7 @@ export class Relief {
   // ---------- drawing ----------
   _loop(now) {
     this._raf = requestAnimationFrame(this._loop);
-    if (!this.active) return;
+    if (!this.active || this._lost) return;
     let moving = false;
     if (this.driver) {
       moving = this.driver(now) !== false;
@@ -476,6 +491,7 @@ export class Relief {
    * disturbing the live view.
    */
   snapshot(ctx, view, width, height) {
+    if (this._lost) return;
     const keep = { view: this.view, tween: this._tween, w: this.canvas.width, h: this.canvas.height };
     this._tween = null;
     this._fixedSize = true;

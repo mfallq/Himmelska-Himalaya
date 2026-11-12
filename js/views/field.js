@@ -277,7 +277,7 @@ export async function mountField(root) {
       <div class="poicard" id="f-card" hidden></div>
       <div class="attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors · relief from Mapzen terrain tiles · <span id="f-date"></span></div>
     </div>
-    <p class="tiny faint" style="margin-top:8px">Drag to move. Ctrl + scroll or pinch to zoom.</p>
+    <p class="tiny faint" style="margin-top:8px">${matchMedia('(pointer: coarse)').matches ? 'Drag to move. Pinch to zoom.' : 'Drag to move. Ctrl + scroll to zoom.'}</p>
     <details class="fold" style="margin-top:14px"><summary>See the places as a list<span class="sub" id="f-listcount"></span></summary><div class="fold-body"><div class="poilist" id="f-list"></div></div></details>
     <details class="fold"><summary>What this data is, and what it is not</summary><div class="fold-body">
       <p>Places come from OpenStreetMap, a map made by volunteers. Coverage is good in the villages and thin between them. Lodges open and close, water points run dry, and health posts are staffed only in season.</p>

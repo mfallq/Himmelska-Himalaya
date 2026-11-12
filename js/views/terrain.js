@@ -16,7 +16,7 @@ function template() {
       <div class="labels" id="t-labels"></div>
       <div class="hero-ui">
         <div class="daychip"><span id="t-chip"></span><small id="t-chip-sub"></small></div>
-        <p class="hint">Drag to orbit · Shift-drag to move · Ctrl + scroll or pinch to zoom</p>
+        <p class="hint">${matchMedia('(pointer: coarse)').matches ? 'Drag to turn · Pinch to zoom · Two fingers to move' : 'Drag to turn · Shift-drag to move · Ctrl + scroll to zoom'}</p>
         <div class="hero-tools">
           <button class="pill icon" type="button" data-zoom="0.75" aria-label="Zoom in">+</button>
           <button class="pill icon" type="button" data-zoom="1.33" aria-label="Zoom out">−</button>

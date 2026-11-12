@@ -19,7 +19,7 @@ if (target === ROOT || ROOT.startsWith(target + path.sep) || target.startsWith(R
 
 const manifest = JSON.parse(await fs.readFile(path.join(ROOT, 'precache.json'), 'utf8'));
 const files = [
-  ...manifest.files.filter((f) => f !== './'),
+  ...manifest.files.map((f) => f.url).filter((u) => u !== './'),
   'sw.js',
   'precache.json',
   'assets/terrain/satellite.jpg',

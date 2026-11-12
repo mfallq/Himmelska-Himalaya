@@ -36,8 +36,12 @@ function render(n) {
   const section = (id, eyebrow, title, body) => html`<section id="${id}"><p class="eyebrow">${eyebrow}</p><h3 class="h2" style="font-size:clamp(26px,3vw,34px)">${title}</h3>${body}</section>`;
 
   return html`
-    <div class="sheet-grab"></div>
-    <button class="btn btn-sm sheet-close" type="button" data-close>Close ×</button>
+    <div class="sheet-bar">
+      <span class="sheet-pos">Day ${n} of ${TRIP.days}</span>
+      <button class="btn btn-sm" type="button" data-go="${n - 1}" aria-label="Previous day"${n <= 1 ? ' disabled' : ''}>‹</button>
+      <button class="btn btn-sm" type="button" data-go="${n + 1}" aria-label="Next day"${n >= TRIP.days ? ' disabled' : ''}>›</button>
+      <button class="btn btn-sm" type="button" data-close>Close</button>
+    </div>
     <div class="sheet-body">
       <section>
         <p class="eyebrow">Trail companion · ${KINDS[d.kind]}</p>
