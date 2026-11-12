@@ -1,0 +1,16 @@
+{
+  "bbox": {
+    "west": 83.36,
+    "south": 28.1,
+    "east": 84.7,
+    "north": 28.95
+  },
+  "width": 576,
+  "height": 413,
+  "step": 4,
+  "widthKm": 131.06,
+  "heightKm": 93.99,
+  "minElevation": 390,
+  "maxElevation": 8106,
+  "source": "Mapzen Terrain Tiles on AWS Open Data (SRTM and other sources), resampled"
+}

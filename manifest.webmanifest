@@ -1,0 +1,13 @@
+{
+  "name": "Himmelska Himalaya · Annapurna Circuit",
+  "short_name": "Annapurna",
+  "description": "A day-by-day trail companion for the Annapurna Circuit that works without signal.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a1217",
+  "theme_color": "#0a1217",
+  "icons": [
+    { "src": "assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

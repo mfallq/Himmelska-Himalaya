@@ -1,0 +1,23 @@
+# Published as .htaccess in the site's folder on expandialabs.com.
+# It adjusts two rules inherited from the main site's .htaccess.
+
+# 1. Content-Security-Policy: same as the main site, plus the satellite tile
+#    server used by the optional "Satellite online" layer of the relief.
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.maps.eox.at; font-src 'self'; connect-src 'self' https://tiles.maps.eox.at; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+</IfModule>
+
+# 2. Caching: the main site caches CSS and JS for a year because its files carry
+#    ?v= versions. These files do not, and the service worker already keeps an
+#    offline copy, so ask the browser to revalidate instead.
+<IfModule mod_expires.c>
+  ExpiresActive Off
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|css|js|json|webmanifest)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(woff2|png|svg)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>

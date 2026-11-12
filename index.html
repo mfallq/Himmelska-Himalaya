@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Himmelska Himalaya · Annapurna Circuit trail companion</title>
+  <meta name="description" content="A day-by-day companion for the Annapurna Circuit in Nepal: a 3D relief of the route, every stage, altitude and acclimatisation, permits, packing and a checklist that works without signal.">
+  <meta name="theme-color" content="#0a1217">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <a class="brand" href="#/journey" aria-label="Himmelska Himalaya, start">
+      <svg viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true">
+        <path d="M1 19 10.5 4l4.2 6.6L18 6l11 13z"/><path d="m7.6 8.6 2.9 2.2 2.5-2.6"/>
+      </svg>
+      <span>Annapurna <span class="sub">Circuit</span> <span class="slash">/</span> Nepal</span>
+    </a>
+    <div class="topbar-actions">
+      <button class="topbtn is-accent" type="button" id="btn-dates"><span id="dates-label">Set your dates</span></button>
+      <button class="topbtn" type="button" id="btn-offline" title="Offline status"><i class="dot" id="offline-dot"></i><span class="long" id="offline-label">Offline: checking</span></button>
+      <button class="topbtn" type="button" id="btn-theme"><span class="long">Theme:&nbsp;</span><span id="theme-label">Auto</span></button>
+      <button class="topbtn" type="button" id="btn-about"><span class="long">About &amp;&nbsp;</span>sources</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="view" id="view-journey" data-view="journey" hidden></section>
+    <section class="view" id="view-terrain" data-view="terrain" hidden></section>
+    <section class="view" id="view-days" data-view="days" hidden></section>
+    <section class="view" id="view-altitude" data-view="altitude" hidden></section>
+    <section class="view" id="view-practical" data-view="practical" hidden></section>
+    <footer class="footer wrap">
+      <p>Himmelska Himalaya is a planning companion, not a guide service. Trail, permit and weather conditions change: confirm them locally before you rely on anything here.</p>
+      <p>No tracking and no account. Your dates, ticks and journal stay in this browser.</p>
+    </footer>
+  </main>
+
+  <nav class="tabbar" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" type="button" data-tab="journey" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/></svg>
+      Journey
+    </button>
+    <button class="tab" role="tab" type="button" data-tab="terrain" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M2 20 9 7l4 6 3-4 6 11z"/><path d="m6.8 11 2.2 1.6 1.8-2"/></svg>
+      Relief 3D
+    </button>
+    <button class="tab" role="tab" type="button" data-tab="days" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
+      Days
+    </button>
+    <button class="tab" role="tab" type="button" data-tab="altitude" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="m7 15 4-5 3 3 5-7"/></svg>
+      Altitude
+    </button>
+    <button class="tab" role="tab" type="button" data-tab="practical" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M6 9h12l1 11H5z"/><path d="M9 9V7a3 3 0 0 1 6 0v2M10 13h4"/></svg>
+      Practical
+    </button>
+  </nav>
+
+  <dialog class="sheet" id="day-dialog" aria-labelledby="day-dialog-title"></dialog>
+  <dialog class="modal" id="modal" aria-labelledby="modal-title"></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <noscript>
+    <p style="padding:24px;max-width:60ch">This companion needs JavaScript to draw the relief, the altitude chart and the checklists.</p>
+  </noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
