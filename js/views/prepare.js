@@ -1,9 +1,9 @@
-// "Practical": countdowns, what to sort out before leaving, the checklist,
-// culture notes, phone and power, the journal and the sources.
+// "Prepare": the checklist first, then what to sort out before leaving, what to
+// know on the trail, how to get there, the journal and the sources.
 import { html, $, $$, dateShort, dateLong, daysBetween, download, toast, metres } from '../util.js';
 import { store } from '../store.js';
 import { DAYS, TRIP, STOPS, dateOf } from '../data.js';
-import { PRACTICAL_CARDS, TOWNS, SEASONS, ALERTS, CULTURE, PHONE, CHECKLIST, SOURCES, CREDITS } from '../content/guide.js';
+import { PRACTICAL_CARDS, TOWNS, SEASONS, ALERTS, CULTURE, PHONE, CHECKLIST, SOURCES, CREDITS, DOOR_TO_DOOR } from '../content/guide.js';
 import { buildGpx } from '../lib/gpx.js';
 import { datesDialog } from '../ui/shell.js';
 import { openDay } from './daysheet.js';
@@ -11,16 +11,28 @@ import { openDay } from './daysheet.js';
 const TOTAL = CHECKLIST.reduce((n, g) => n + g.items.length, 0);
 const TABS = [
   ['checklist', 'Checklist'],
-  ['culture', 'Nature and culture'],
-  ['phone', 'Phone and power'],
+  ['before', 'Before you go'],
+  ['trail', 'On the trail'],
+  ['getting', 'Getting there'],
   ['journal', 'Journal'],
   ['sources', 'Sources'],
 ];
+const card = (c) => html`<div class="card"><h3 class="h3">${c.title}</h3><p class="muted">${c.text}</p></div>`;
+const practical = (ids) => PRACTICAL_CARDS.filter((c) => ids.includes(c.id)).map((c) => html`<div class="card">
+  <h3 class="h3">${c.title}</h3>
+  ${c.lead ? html`<p><b>${c.lead}</b></p>` : ''}
+  ${c.bar ? html`<div class="loadbar" role="img" aria-label="${c.barNote}"><i style="flex:${c.bar[0]}"></i><i style="flex:${c.bar[1]}"></i></div><p class="small muted">${c.barNote}</p>` : ''}
+  <ul class="bullets">${c.points.map((p) => html`<li>${p}</li>`)}</ul></div>`);
 
-function countdown(label, date) {
-  const diff = daysBetween(new Date(), date);
-  const text = diff > 1 ? `${diff} days to go` : diff === 1 ? 'Tomorrow' : diff === 0 ? 'Today' : diff === -1 ? 'Yesterday' : `${-diff} days ago`;
-  return html`<div><p class="eyebrow">${label} · ${dateShort(date)}</p><b>${text}</b><p class="small muted">${dateLong(date)}</p></div>`;
+function countdown() {
+  const start = dateOf(1);
+  if (!start) return html`<p class="small muted">No dates yet. <button class="linkbtn" type="button" data-dates style="color:var(--accent)">Set your dates</button> for countdowns and real dates on every stage.</p>`;
+  const line = (label, date) => {
+    const diff = daysBetween(new Date(), date);
+    const text = diff > 1 ? `in ${diff} days` : diff === 1 ? 'tomorrow' : diff === 0 ? 'today' : diff === -1 ? 'yesterday' : `${-diff} days ago`;
+    return html`<li><span class="muted">${label}</span> <b>${dateShort(date)}</b> · ${text}</li>`;
+  };
+  return html`<ul class="countlist">${line('Arrival in Kathmandu', start)}${line('Thorong La', dateOf(TRIP.passDay))}</ul>`;
 }
 
 function checklistPanel(query, filter) {
@@ -49,9 +61,9 @@ function journalPanel() {
   const journal = store.state.journal;
   const written = DAYS.filter((d) => journal[d.n]?.note?.trim() || journal[d.n]?.s?.some(Boolean));
   return html`
-    <p class="muted" style="max-width:70ch">Each day sheet has a note field and an evening altitude check. What you write is kept in this browser only. Export it before you change phone or clear your browser.</p>
+    <p class="muted" style="max-width:70ch">Write in the Journal fold on each day. It stays on this phone. Save a backup in the menu before you change phone.</p>
     <div class="chips" style="margin:14px 0 20px">
-      <button class="btn btn-sm" type="button" data-journal-export${written.length ? '' : ' disabled'}>Export as text</button>
+      <button class="btn btn-sm" type="button" data-journal-export${written.length ? '' : ' disabled'}>Save as text</button>
       <button class="btn btn-sm" type="button" data-open-day="${store.state.day}">Write for day ${store.state.day}</button>
     </div>
     ${written.length
@@ -88,73 +100,64 @@ export async function mount(root) {
     if (tab === 'checklist') {
       const done = Object.values(store.state.checks).filter(Boolean).length;
       return html`
-        <div class="progress-head"><h2 class="h2">The whole preparation, item by item.</h2><span class="count num" id="p-count">${done} / ${TOTAL} done</span></div>
-        <div class="grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr);margin:18px 0 10px">
-          <input class="field" type="search" id="p-search" placeholder="Search the checklist…" value="${query}" aria-label="Search the checklist">
+        <div class="progress-head"><h2 class="h2">Checklist</h2><span class="count num" id="p-count">${done} / ${TOTAL} done</span></div>
+        <div class="grid searchrow" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr);margin:14px 0 10px">
+          <input class="field" type="search" id="p-search" placeholder="Search the checklist" value="${query}" aria-label="Search the checklist">
           <select class="field" id="p-filter" aria-label="Filter">
             <option value="all"${filter === 'all' ? ' selected' : ''}>All items</option>
             <option value="open"${filter === 'open' ? ' selected' : ''}>Still open</option>
             <option value="done"${filter === 'done' ? ' selected' : ''}>Done</option>
           </select>
         </div>
-        <p class="small faint" style="margin-bottom:14px">A tick is your own confirmation. The list cannot know what your agency has arranged, so check those items with them.</p>
+        <p class="small faint" style="margin-bottom:14px">A tick is your own confirmation. Check items your agency handles with them.</p>
         <div id="p-list">${checklistPanel(query, filter)}</div>`;
     }
-    if (tab === 'culture') return html`<div class="grid two">${CULTURE.map((c) => html`<div class="card"><h3 class="h3">${c.title}</h3><p class="muted">${c.text}</p></div>`)}</div>`;
-    if (tab === 'phone') {
-      return html`<div class="grid two">${PHONE.map((c) => html`<div class="card"><h3 class="h3">${c.title}</h3><p class="muted">${c.text}</p></div>`)}</div>
-        <div class="card callout" style="margin-top:16px"><h3 class="h3">Take the route with you</h3><p class="muted">A GPX file of the walking stages and overnight stops, for any offline map app or GPS watch. It is simplified from OpenStreetMap trails: a planning aid, not a recorded track.</p><div><button class="btn btn-primary" type="button" data-gpx>Export the route as GPX</button></div></div>`;
+    if (tab === 'before') {
+      return html`
+        <div class="grid two">${practical(['papers', 'pack'])}</div>
+        <h2 class="h3" style="margin:30px 0 12px">When to go</h2>
+        <div class="grid four">
+          ${SEASONS.map((s) => html`<div class="card"><p class="eyebrow ${s.level === 3 ? '' : 'dim'}">${s.months}</p><h3 class="h3">${s.name}</h3>
+            <div class="loadbar" role="img" aria-label="${s.level} of 3"><i style="flex:${s.level}"></i><i style="flex:${3 - s.level || 0.001};opacity:.35"></i></div><p class="muted small">${s.text}</p></div>`)}
+        </div>
+        <h2 class="h3" style="margin:30px 0 12px">Read these once</h2>
+        <div class="grid" style="gap:10px">${ALERTS.map((a) => html`<div class="card alert"><h3 class="h3">${a.title}</h3><p class="muted">${a.text}</p></div>`)}</div>`;
+    }
+    if (tab === 'trail') {
+      return html`
+        <div class="grid two">${practical(['cold', 'power'])}${PHONE.map(card)}</div>
+        <div class="card callout" style="margin-top:16px"><h3 class="h3">Route as GPX</h3><p class="muted">The walking stages and stops, for any offline map app or GPS watch. Simplified from OpenStreetMap trails: a planning aid, not a recorded track.</p><div><button class="btn btn-primary" type="button" data-gpx>Save route as GPX</button></div></div>
+        <h2 class="h3" style="margin:30px 0 12px">Nature and culture</h2>
+        <div class="grid two">${CULTURE.map(card)}</div>`;
+    }
+    if (tab === 'getting') {
+      return html`
+        <ol class="timeline">
+          ${DOOR_TO_DOOR.map((leg) => {
+            const date = leg.day ? dateOf(leg.day) : null;
+            return html`<li><p class="when">${leg.when}${date ? ' · ' + dateShort(date) : ''}</p><p class="what">${leg.what}</p><p class="muted small">${leg.text}</p>${leg.day ? html`<button class="linkbtn" type="button" data-open-day="${leg.day}" style="margin-top:8px;color:var(--accent)">Open day ${leg.day}</button>` : ''}</li>`;
+          })}
+        </ol>
+        <div class="grid two" style="margin-top:6px">${TOWNS.map((t) => html`<div class="card"><h3 class="h3">${t.name}</h3><p class="muted small">${t.note}</p><div class="chips">${t.places.map((p) => html`<span class="chip">${p}</span>`)}</div></div>`)}</div>
+        <div class="card callout" style="margin-top:16px"><h3 class="h3">The way to Kathmandu</h3><p class="muted small">A globe with the flight paths in. For orientation only.</p><div><a class="btn" href="#/journey">Open the globe</a></div></div>`;
     }
     if (tab === 'journal') return journalPanel();
     const groups = [...new Set(SOURCES.map((s) => s.group))];
     return html`
       <div class="grid two">${groups.map((g) => html`<div class="card"><h3 class="h3">${g}</h3><ul class="bullets">${SOURCES.filter((s) => s.group === g).map((s) => html`<li><a href="${s.url}" target="_blank" rel="noopener">${s.label}</a><br><span class="small">${s.note}</span></li>`)}</ul></div>`)}</div>
-      <div class="card" style="margin-top:16px"><h3 class="h3">What this site is built from</h3><ul class="bullets">${CREDITS.map((c) => html`<li><b>${c.what}:</b> ${c.who}${c.url ? html` · <a href="${c.url}" target="_blank" rel="noopener">${c.label}</a>` : ''}</li>`)}</ul>
-      <p class="small faint">Facts were checked in November 2026. Where sources disagreed, the text says so.</p></div>`;
+      <div class="card" style="margin-top:16px"><h3 class="h3">Built from</h3><ul class="bullets">${CREDITS.map((c) => html`<li><b>${c.what}:</b> ${c.who}${c.url ? html` · <a href="${c.url}" target="_blank" rel="noopener">${c.label}</a>` : ''}</li>`)}</ul>
+      <p class="small faint">Facts checked in November 2026. Where sources disagree, the text says so.</p></div>`;
   };
 
   const draw = () => {
-    const start = dateOf(1);
     root.innerHTML = html`
       <div class="wrap">
         <section class="section">
           <div class="section-head">
-            <p class="eyebrow dim">Before you go, and on the trail</p>
-            <h1 class="display">The practical <em>side</em>.</h1>
-            <p class="lede">The small things that leave room for the walk itself.</p>
+            <h1 class="display">Prepare</h1>
+            ${countdown()}
           </div>
-          <div class="card">
-            ${start
-              ? html`<div class="countdown">${countdown('Arrival in Kathmandu', start)}${countdown('Thorong La', dateOf(TRIP.passDay))}</div>`
-              : html`<div class="toolbar"><div><p class="eyebrow">Countdown</p><p class="muted" style="margin-top:6px">Add your arrival date to count down to Kathmandu and to the day of the pass.</p></div><button class="btn btn-primary" type="button" data-dates>Set your dates</button></div>`}
-          </div>
-          <div class="grid two" style="margin-top:16px">
-            ${PRACTICAL_CARDS.map((c) => html`<div class="card">
-              <h2 class="h3">${c.title}</h2>
-              ${c.lead ? html`<p><b>${c.lead}</b></p>` : ''}
-              ${c.bar ? html`<div class="loadbar" role="img" aria-label="${c.barNote}"><i style="flex:${c.bar[0]}"></i><i style="flex:${c.bar[1]}"></i></div><p class="small muted">${c.barNote}</p>` : ''}
-              <ul class="bullets">${c.points.map((p) => html`<li>${p}</li>`)}</ul></div>`)}
-          </div>
-          <div class="grid two" style="margin-top:16px">
-            ${TOWNS.map((t) => html`<div class="card"><h2 class="h3">${t.name}</h2><p class="muted small">${t.note}</p><div class="chips">${t.places.map((p) => html`<span class="chip">${p}</span>`)}</div></div>`)}
-          </div>
-        </section>
-
-        <section class="section">
-          <div class="section-head"><p class="eyebrow">When to go</p><h2 class="h2">Four seasons, two good ones.</h2></div>
-          <div class="grid four">
-            ${SEASONS.map((s) => html`<div class="card"><p class="eyebrow ${s.level === 3 ? '' : 'dim'}">${s.months}</p><h3 class="h3">${s.name}</h3>
-              <div class="loadbar" role="img" aria-label="${s.level} of 3"><i style="flex:${s.level}"></i><i style="flex:${3 - s.level || 0.001};opacity:.35"></i></div><p class="muted small">${s.text}</p></div>`)}
-          </div>
-        </section>
-
-        <section class="section">
-          <div class="section-head"><p class="eyebrow">Read these once</p><h2 class="h2">Four things that change.</h2></div>
-          <div class="grid" style="gap:10px">${ALERTS.map((a) => html`<div class="card alert"><h3 class="h3">${a.title}</h3><p class="muted">${a.text}</p></div>`)}</div>
-        </section>
-
-        <section class="section">
-          <div class="subtabs" role="tablist" aria-label="Practical sections" style="margin-bottom:26px">
+          <div class="subtabs" role="tablist" aria-label="Prepare sections" style="margin-bottom:24px">
             ${TABS.map(([id, label]) => html`<button type="button" role="tab" data-ptab="${id}" aria-selected="${String(id === tab)}">${label}</button>`)}
           </div>
           <div id="p-panel">${panel()}</div>
@@ -176,7 +179,7 @@ export async function mount(root) {
     } else if (t.dataset.dates !== undefined) datesDialog();
     else if (t.dataset.gpx !== undefined) {
       download('annapurna-circuit.gpx', buildGpx(), 'application/gpx+xml');
-      toast('Route exported. Open the file in your map app.');
+      toast('Route saved. Open the file in your map app.');
     } else if (t.dataset.journalExport !== undefined) exportJournal();
     else if (t.dataset.openDay) openDay(Number(t.dataset.openDay));
   });

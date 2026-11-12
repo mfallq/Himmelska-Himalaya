@@ -210,7 +210,7 @@ export const CHECKLIST = [
       ['adapter', 'Universal adapter and cables', 'Types C, D and M are in use.'],
       ['offline', 'This site opened once online, so it is saved on the phone', 'Then test it in flight mode.'],
       ['offlinemap', 'Offline map of the region downloaded', ''],
-      ['gpx', 'Route exported as GPX and loaded in your map app', 'From the Relief 3D tab.'],
+      ['gpx', 'Route exported as GPX and loaded in your map app', 'From Prepare, On the trail.'],
       ['sim', 'Local SIM or eSIM arranged', ''],
       ['camera', 'Camera, cards and a spare battery', ''],
     ],

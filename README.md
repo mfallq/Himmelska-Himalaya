@@ -5,13 +5,15 @@ This repo is built by Claude AI based on my friends EBC trek site https://cipria
 
 ## What it is
 
-A trail companion for the Annapurna Circuit, in English, in five tabs:
+A trail companion for the Annapurna Circuit, in English, built phone first, in five tabs:
 
-- **Journey**: a globe with the way to Kathmandu and the trip door to door.
-- **Relief 3D**: the Annapurna range as a 3D relief with the route, a day slider, a fly-through, and a field map of water, lodging, health posts and more along the trail.
-- **Days**: the 18-day itinerary. Each day opens a sheet with the plan, stops, stories, kit, daylight times and a journal.
+- **Today**: the stage the plan puts you on (by your arrival date, in Nepal time): numbers, three things to know, light times. Before the trip it counts down.
+- **Map**: a flat map of the trail with 1,600 mapped places, and "Where am I" from the phone's GPS (progress, distance and climb left, next stop). The 3D relief with a day slider and fly-through is its second mode.
+- **Days**: the 18-day itinerary. A day opens a sheet: numbers, know this, height profile, then folded sections and a journal.
 - **Altitude**: sleeping heights, the walk in profile, and the acclimatisation rules checked against the plan.
-- **Practical**: permits, packing, seasons, a checklist, and the sources.
+- **Prepare**: checklist, before you go, on the trail, getting there (with the globe), journal, sources.
+
+The top bar has **Emergency** (serious signs, Nepal numbers, your own numbers, your position) and **Menu** (dates, offline, theme, backup, about). Your position is read only when you ask, and is never stored or sent.
 
 It is a static site with no build step and no dependencies. Dates, checklist ticks and the journal are stored in the visitor's browser only.
 
@@ -41,7 +43,9 @@ The site is live at `expandialabs.com/himmelska-himalaya/`. That repository hold
 node tools/publish.mjs ../expandialabs/site/himmelska-himalaya
 ```
 
-The copy includes `deploy/htaccess` as `.htaccess`, which stops CSS and JS being cached for a year, a rule inherited from the main site.
+The copy includes `deploy/htaccess` as `.htaccess`. It stops CSS and JS being cached for a year (a rule inherited from the main site) and allows `geolocation` for this folder, which the main site otherwise blocks.
+
+Tests: `node --test tools/test/*.test.mjs`.
 
 ## On a phone, without signal
 

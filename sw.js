@@ -4,7 +4,7 @@
 // at once. A new version is downloaded whole into its own cache and only takes
 // over when every file has arrived, so the site is never half old and half new.
 // If anything fails, the old version keeps running.
-const VERSION = '4a54b1c9b366';
+const VERSION = '87c9809fb04a';
 const PREFIX = 'hh-site-';
 const CACHE = PREFIX + VERSION;
 

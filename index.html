@@ -30,46 +30,49 @@
       <span>Annapurna <span class="sub">Circuit <span class="slash">/</span> Nepal</span></span>
     </a>
     <div class="topbar-actions">
-      <button class="topbtn is-accent" type="button" id="btn-dates"><span id="dates-label">Set your dates</span></button>
-      <button class="topbtn" type="button" id="btn-offline" title="Offline status"><i class="dot" id="offline-dot"></i><span class="long" id="offline-label">Offline: checking</span></button>
-      <button class="topbtn" type="button" id="btn-theme"><span class="long">Theme:&nbsp;</span><span id="theme-label">Auto</span></button>
-      <button class="topbtn" type="button" id="btn-about"><span class="long">About &amp;&nbsp;sources</span><span class="short">Info</span></button>
+      <button class="topbtn is-warn" type="button" id="btn-sos">Emergency</button>
+      <button class="topbtn is-accent wide-only" type="button" id="btn-dates"><span id="dates-label">Set your dates</span></button>
+      <button class="topbtn wide-only" type="button" id="btn-offline" title="Offline status"><i class="dot" id="offline-dot"></i><span id="offline-label">Offline: checking</span></button>
+      <button class="topbtn wide-only" type="button" id="btn-theme"><span>Theme:&nbsp;</span><span id="theme-label">Auto</span></button>
+      <button class="topbtn wide-only" type="button" id="btn-about"><span>About</span></button>
+      <button class="topbtn small-only" type="button" id="btn-menu"><i class="dot" data-offline-dot></i><span>Menu</span></button>
     </div>
   </header>
 
   <main id="main">
-    <section class="view" id="view-journey" data-view="journey" hidden></section>
-    <section class="view" id="view-terrain" data-view="terrain" hidden></section>
+    <section class="view" id="view-today" data-view="today" hidden></section>
+    <section class="view" id="view-map" data-view="map" hidden></section>
     <section class="view" id="view-days" data-view="days" hidden></section>
     <section class="view" id="view-altitude" data-view="altitude" hidden></section>
-    <section class="view" id="view-practical" data-view="practical" hidden></section>
+    <section class="view" id="view-prepare" data-view="prepare" hidden></section>
+    <section class="view" id="view-journey" data-view="journey" hidden></section>
     <footer class="footer wrap">
-      <p>Himmelska Himalaya is a planning companion, not a guide service. Trail, permit and weather conditions change: confirm them locally before you rely on anything here.</p>
-      <p>No tracking and no account. Your dates, ticks and journal stay in this browser.</p>
+      <p>A planning companion, not a guide service. Trail, permit and weather conditions change: confirm them locally.</p>
+      <p>No tracking, no account. Your data stays on this phone.</p>
     </footer>
   </main>
 
-  <nav class="tabbar" role="tablist" aria-label="Sections">
-    <button class="tab" role="tab" type="button" data-tab="journey" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/></svg>
-      Journey
-    </button>
-    <button class="tab" role="tab" type="button" data-tab="terrain" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M2 20 9 7l4 6 3-4 6 11z"/><path d="m6.8 11 2.2 1.6 1.8-2"/></svg>
-      Relief 3D
-    </button>
-    <button class="tab" role="tab" type="button" data-tab="days" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
+  <nav class="tabbar" aria-label="Sections">
+    <a class="tab" href="#/today" data-tab="today">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg>
+      Today
+    </a>
+    <a class="tab" href="#/map" data-tab="map">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
+      Map
+    </a>
+    <a class="tab" href="#/days" data-tab="days">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
       Days
-    </button>
-    <button class="tab" role="tab" type="button" data-tab="altitude" aria-selected="false">
+    </a>
+    <a class="tab" href="#/altitude" data-tab="altitude">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="m7 15 4-5 3 3 5-7"/></svg>
       Altitude
-    </button>
-    <button class="tab" role="tab" type="button" data-tab="practical" aria-selected="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M6 9h12l1 11H5z"/><path d="M9 9V7a3 3 0 0 1 6 0v2M10 13h4"/></svg>
-      Practical
-    </button>
+    </a>
+    <a class="tab" href="#/prepare" data-tab="prepare">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="m9 10 2 2 4-4M9 16h6"/></svg>
+      Prepare
+    </a>
   </nav>
 
   <dialog class="sheet" id="day-dialog" aria-labelledby="day-dialog-title"></dialog>

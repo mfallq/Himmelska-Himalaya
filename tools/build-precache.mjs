@@ -24,6 +24,18 @@ async function walk(rel, out) {
 
 const names = [];
 for (const entry of INCLUDE) await walk(entry, names);
+// Windows sometimes holds a file for a moment (virus scanner, a running server): try again.
+async function write(file, text) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await fs.writeFile(file, text);
+    } catch (err) {
+      if (attempt >= 5) throw err;
+      await new Promise((r) => setTimeout(r, 150 * attempt));
+    }
+  }
+}
+
 const files = [{ url: './', hash: 'start' }];
 const all = crypto.createHash('sha256');
 let bytes = 0;
@@ -42,6 +54,6 @@ const VERSION_LINE = /const VERSION = '[^']*';/;
 if (!VERSION_LINE.test(sw)) throw new Error('sw.js has no VERSION line');
 all.update('sw.js').update(sw.replace(VERSION_LINE, ''));
 const version = all.digest('hex').slice(0, 12);
-await fs.writeFile(path.join(ROOT, 'precache.json'), JSON.stringify({ version, files }, null, 2) + '\n');
-await fs.writeFile(swPath, sw.replace(VERSION_LINE, `const VERSION = '${version}';`));
+await write(path.join(ROOT, 'precache.json'), JSON.stringify({ version, files }, null, 2) + '\n');
+await write(swPath, sw.replace(VERSION_LINE, `const VERSION = '${version}';`));
 console.log(`precache.json: ${files.length - 1} files, ${(bytes / 1024).toFixed(0)} KB, version ${version}`);

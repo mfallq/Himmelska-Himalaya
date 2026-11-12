@@ -3,7 +3,8 @@
 const KEY = 'hh:v1';
 const defaults = {
   day: 1,
-  settings: { startDate: '', theme: 'auto', home: '' },
+  // shift: days the plan has slipped. contacts: the traveller's own emergency numbers.
+  settings: { startDate: '', theme: 'auto', home: '', shift: 0, contacts: {} },
   checks: {}, // checklist item id -> true
   journal: {}, // day number -> { note, check: { headache, stomach, fatigue, dizzy } }
   // The slow orbit keeps the GPU busy: off by default on phones to save battery.

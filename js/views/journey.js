@@ -249,7 +249,7 @@ export async function mount(root) {
           <h1 class="display">Around<br><em>Annapurna</em>.</h1>
           <p class="text">From your front door to ${num(TRIP.highPoint)} metres and home again. ${TRIP.days} days, about ${TRIP.walkKm} km on foot, between rice terraces, ice and high desert.</p>
           <div class="chips">
-            <a class="btn btn-primary btn-caps" href="#/terrain">Enter the Himalaya ↗</a>
+            <a class="btn btn-primary btn-caps" href="#/map">Enter the Himalaya ↗</a>
             <a class="btn btn-caps" href="#/days">See the days</a>
           </div>
           <div class="legs">
@@ -285,7 +285,7 @@ export async function mount(root) {
               <div class="stat"><b>${num(TRIP.highPoint)}</b><span>metres at Thorong La</span></div>
               <div class="stat"><b>${TRIP.walkKm}</b><span>km on foot</span></div>
             </div>
-            <div class="card callout"><h3 class="h3">The Himalaya, in relief</h3><p class="muted small">Open the 3D relief to follow the route stage by stage from Jagat over the pass to Poon Hill. It works without a connection.</p><div><a class="btn" href="#/terrain">Open the relief ↗</a></div></div>
+            <div class="card callout"><h3 class="h3">The Himalaya, in relief</h3><p class="muted small">Open the 3D relief to follow the route stage by stage from Jagat over the pass to Poon Hill. It works without a connection.</p><div><a class="btn" href="#/map">Open the relief ↗</a></div></div>
           </div>
           <div>
             <p class="eyebrow dim" style="margin-bottom:22px">From door to door</p>

@@ -93,6 +93,10 @@ export class Dem {
   }
 }
 
+let shared = null;
+/** One decoded grid for the whole site: the 3D relief and the flat map use the same one. */
+export const getDem = (meta) => (shared ??= loadDem(meta).catch((err) => ((shared = null), Promise.reject(err))));
+
 export async function loadDem(meta, url = 'assets/terrain/dem.png') {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`elevation grid: HTTP ${res.status}`);

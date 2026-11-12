@@ -79,7 +79,6 @@ function template() {
           from 2016, so snow and vegetation are not today’s. The light is cinematic: it is not the weather and not a computed sunrise.
         </p>
       </section>
-      <section class="section" id="field" hidden></section>
     </div>`;
 }
 
@@ -331,20 +330,6 @@ export async function mount(root) {
     renderDay(store.state.day);
     syncControls();
     frame(store.state.day, 0);
-    // The field file is heavy to build, so it waits until it is nearly on screen.
-    const field = $('#field', root);
-    field.hidden = false;
-    field.style.minHeight = '320px';
-    const watcher = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        watcher.disconnect();
-        field.style.minHeight = '';
-        import('./field.js').then((m) => m.mountField(field)).catch((err) => console.warn('field file unavailable:', err));
-      },
-      { rootMargin: '700px' },
-    );
-    watcher.observe(field);
   } catch (err) {
     hero.insertAdjacentHTML(
       'beforeend',

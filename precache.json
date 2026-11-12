@@ -1,5 +1,5 @@
 {
-  "version": "4a54b1c9b366",
+  "version": "87c9809fb04a",
   "files": [
     {
       "url": "./",
@@ -7,7 +7,7 @@
     },
     {
       "url": "index.html",
-      "hash": "d3c4ce9e0512"
+      "hash": "0939cf3eba5c"
     },
     {
       "url": "manifest.webmanifest",
@@ -15,7 +15,7 @@
     },
     {
       "url": "css/styles.css",
-      "hash": "86da45352a34"
+      "hash": "50e6cec8f9fa"
     },
     {
       "url": "js/content/details-a.js",
@@ -27,15 +27,19 @@
     },
     {
       "url": "js/content/details.js",
-      "hash": "a7a9a922ce09"
+      "hash": "09e859a0206e"
     },
     {
       "url": "js/content/guide.js",
-      "hash": "9909779382b8"
+      "hash": "fa0f9a7cb892"
     },
     {
       "url": "js/content/itinerary.js",
       "hash": "23b64083d52b"
+    },
+    {
+      "url": "js/content/key.js",
+      "hash": "309968026ea7"
     },
     {
       "url": "js/content/stops.js",
@@ -50,24 +54,36 @@
       "hash": "80c547573328"
     },
     {
+      "url": "js/lib/locate.js",
+      "hash": "22311f20ddaf"
+    },
+    {
       "url": "js/lib/sun.js",
       "hash": "def9d87eb254"
     },
     {
+      "url": "js/lib/track.js",
+      "hash": "105fdcd6f895"
+    },
+    {
+      "url": "js/lib/tripday.js",
+      "hash": "5039664f7c16"
+    },
+    {
       "url": "js/main.js",
-      "hash": "3a1566f027e2"
+      "hash": "15813a2af137"
     },
     {
       "url": "js/offline.js",
-      "hash": "b74575651404"
+      "hash": "86b920782551"
     },
     {
       "url": "js/store.js",
-      "hash": "6b27d46d9352"
+      "hash": "fa4c7bb80166"
     },
     {
       "url": "js/terrain/dem.js",
-      "hash": "6be25e25d51d"
+      "hash": "e158dad37941"
     },
     {
       "url": "js/terrain/paint.js",
@@ -79,15 +95,19 @@
     },
     {
       "url": "js/terrain/scene.js",
-      "hash": "f94f13d74170"
+      "hash": "9d80577b79d4"
     },
     {
       "url": "js/theme.js",
       "hash": "99fb4fa05044"
     },
     {
+      "url": "js/ui/emergency.js",
+      "hash": "e1b8f1cf243e"
+    },
+    {
       "url": "js/ui/shell.js",
-      "hash": "1cb5384e2d16"
+      "hash": "a333288aeaeb"
     },
     {
       "url": "js/util.js",
@@ -95,31 +115,35 @@
     },
     {
       "url": "js/views/altitude.js",
-      "hash": "ced7cfbf149d"
+      "hash": "9c8e4ff86fa2"
     },
     {
       "url": "js/views/days.js",
-      "hash": "72ee8e29316f"
+      "hash": "b3d63a5f0ffc"
     },
     {
       "url": "js/views/daysheet.js",
-      "hash": "aa442b75cccb"
-    },
-    {
-      "url": "js/views/field.js",
-      "hash": "434e94cfac45"
+      "hash": "e8c7e873e67c"
     },
     {
       "url": "js/views/journey.js",
-      "hash": "207b9172b49e"
+      "hash": "8076179a26a8"
     },
     {
-      "url": "js/views/practical.js",
-      "hash": "9e34848993ae"
+      "url": "js/views/map.js",
+      "hash": "6961d409b4a1"
+    },
+    {
+      "url": "js/views/prepare.js",
+      "hash": "fcd86e4bcb12"
     },
     {
       "url": "js/views/terrain.js",
-      "hash": "40db473bb476"
+      "hash": "d788294fd67b"
+    },
+    {
+      "url": "js/views/today.js",
+      "hash": "dcaa0034197f"
     },
     {
       "url": "data/land.json",

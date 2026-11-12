@@ -1,6 +1,6 @@
 // One shared relief for the whole site: the live 3D view, the day thumbnails
 // and the stills in the day sheets all draw from the same WebGL context.
-import { loadDem } from './dem.js';
+import { getDem } from './dem.js';
 import { Relief } from './relief.js';
 import { paintLandcover, drawRoute } from './paint.js';
 import { data, day as dayOf, STOPS } from '../data.js';
@@ -23,7 +23,7 @@ export function getScene() {
     const coarse = matchMedia('(max-width: 760px)').matches;
     // The satellite picture ships with the site, so it also works offline.
     const [dem, photo] = await Promise.all([
-      loadDem(data.terrain),
+      getDem(data.terrain),
       loadImage(coarse ? 'assets/terrain/satellite-small.jpg' : 'assets/terrain/satellite.jpg').catch(() => null),
     ]);
     const canvas = document.createElement('canvas');

@@ -91,9 +91,8 @@ export async function mount(root) {
       <div class="wrap">
         <section class="section">
           <div class="section-head">
-            <p class="eyebrow dim">We gain height and keep our patience</p>
-            <h1 class="display">Thinner air.<br><em>Slower</em> steps.</h1>
-            <p class="lede">The solid line is where you sleep. The dashed marks show how high each day goes. Select a day on either chart.</p>
+            <h1 class="display">Altitude</h1>
+            <p class="lede">Solid line: where you sleep. Dashed marks: the highest point of each day. Tap a day on either chart.</p>
           </div>
           <div class="card chartcard">
             <header><h2 class="h3">Day ${n}${date ? ' · ' + dateShort(date) : ''}</h2><span class="chip">${STOPS[d.to].name} · ${metres(d.sleep)}</span></header>
@@ -116,8 +115,8 @@ export async function mount(root) {
                   <b>${Math.round(p * 100)}%</b>
                 </div>
                 <div style="display:grid;gap:8px">
-                  <h3 class="h3">The same air,<br>less of it.</h3>
-                  <p class="muted small">At ${metres(d.sleep)}, where you sleep on day ${n}, air pressure is about ${Math.round(p * 100)}% of sea level. The air is still 21% oxygen: each breath simply holds less.${d.high > d.sleep + 40 ? ` At the day’s high point, ${metres(d.high)}, it is about ${Math.round(pHigh * 100)}%.` : ''}</p>
+                  <h3 class="h3">Air pressure</h3>
+                  <p class="muted small">At ${metres(d.sleep)}, where you sleep on day ${n}, air pressure is about ${Math.round(p * 100)}% of sea level. The air is still 21% oxygen: each breath holds less.${d.high > d.sleep + 40 ? ` At the high point, ${metres(d.high)}, about ${Math.round(pHigh * 100)}%.` : ''}</p>
                 </div>
               </div>
             </div>
@@ -127,18 +126,17 @@ export async function mount(root) {
 
         <section class="section">
           <div class="section-head">
-            <p class="eyebrow">The plan against the rule</p>
-            <h2 class="h2">Every night above 3,000 m.</h2>
-            <p class="lede">The usual advice is to raise your sleeping height by no more than about 500 m a night once above 3,000 m, with a rest day every few days. This is how the default itinerary measures up.</p>
+            <h2 class="h2">Nights above 3,000 m</h2>
+            <p class="lede">The usual advice: above 3,000 m, raise your sleeping height by no more than about 500 m a night, and rest every few days. This is how the plan measures up.</p>
           </div>
           <ul class="rules">
             ${nights().map(({ d: day, gain, flag }) => html`<li class="${flag ? 'flag' : ''}"><b>Day ${day.n}</b><span>${STOPS[day.to].name} · ${metres(day.sleep)}</span><span class="chip ${flag ? 'warn' : gain <= 0 ? 'ice' : ''}">${gain > 0 ? '+' : gain < 0 ? '−' : ''}${num(Math.abs(gain))} m${flag ? ' · above the guideline' : gain === 0 ? ' · rest' : ''}</span></li>`)}
           </ul>
           <div class="card callout" style="margin-top:16px">
-            <p class="muted">Two nights go over the line. Day 6 crosses 3,000 m with a 630 m jump, softened by the two nights that follow at 3,540 m. Day 9 gains about 510 m. To stay within the guideline, sleep in Lower Pisang on day 6, or add a night in Chame, and take a second night at Yak Kharka if anyone is slow to adjust.</p>
+            <p class="muted">Two nights go over the line. Day 6 jumps 630 m to 3,300 m, followed by two nights at 3,540 m. Day 9 gains about 510 m. To stay within the guideline, sleep in Lower Pisang on day 6, or add a night in Chame. Add a second night at Yak Kharka if anyone is slow to adjust.</p>
           </div>
           <div class="card" style="margin-top:16px">
-            <h3 class="h3">Five rules worth knowing by heart</h3>
+            <h3 class="h3">Five rules</h3>
             <ul class="bullets">${ALTITUDE_RULES.map((r) => html`<li>${r}</li>`)}</ul>
           </div>
           <p class="small faint" style="margin-top:16px">General information, not medical advice. The pressure figure comes from a standard atmosphere model: it is not your blood oxygen and cannot diagnose altitude sickness.
