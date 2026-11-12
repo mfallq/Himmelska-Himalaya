@@ -1,6 +1,6 @@
 // Textures for the relief, all made in the browser from the elevation grid:
 // a natural-colour ground cover, the slope map used for lighting, the route
-// overlay and (optionally, online) a satellite mosaic.
+// overlay. The satellite picture itself is a bundled image (see scene.js).
 import { clamp, lerp, smoothstep } from '../util.js';
 
 /** East-west and north-south slope of every grid cell, in metres per metre. */
@@ -176,66 +176,6 @@ export function drawRoute(ctx, dem, legs, selectedDay, W, H, { scale = 1 } = {})
   ctx.setLineDash([]);
 }
 
-const SATELLITE_LAYERS = ['s2cloudless-2024_3857', 's2cloudless-2023_3857', 's2cloudless-2021_3857', 's2cloudless-2020_3857'];
+/** Credit for assets/terrain/satellite.jpg (built by tools/satellite.html). */
 export const SATELLITE_CREDIT =
-  'Sentinel-2 cloudless by EOX IT Services GmbH (contains modified Copernicus Sentinel data), CC BY-NC-SA 4.0';
-
-const loadImage = (url) =>
-  new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error('tile failed: ' + url));
-    img.src = url;
-  });
-
-/**
- * Fetch a satellite mosaic for the grid's bounding box (needs a connection).
- * Returns a canvas W pixels wide, or throws if the imagery cannot be loaded.
- */
-export async function loadSatellite(dem, W = 2048, zoom = 11) {
-  const { west, east, south, north } = dem.bbox;
-  const H = Math.round((W * dem.height) / dem.width);
-  const n = 2 ** zoom;
-  const tx = (lon) => Math.floor(((lon + 180) / 360) * n);
-  const ty = (lat) => {
-    const r = (lat * Math.PI) / 180;
-    return Math.floor(((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * n);
-  };
-  const tileLon = (x) => (x / n) * 360 - 180;
-  const tileLat = (y) => (Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / n))) * 180) / Math.PI;
-
-  let layer = null;
-  for (const candidate of SATELLITE_LAYERS) {
-    try {
-      await loadImage(`https://tiles.maps.eox.at/wmts/1.0.0/${candidate}/default/g/${zoom}/${ty(north)}/${tx(west)}.jpg`);
-      layer = candidate;
-      break;
-    } catch {}
-  }
-  if (!layer) throw new Error('Satellite imagery is not reachable right now.');
-
-  const canvas = document.createElement('canvas');
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  const jobs = [];
-  for (let y = ty(north); y <= ty(south); y++) {
-    for (let x = tx(west); x <= tx(east); x++) {
-      jobs.push(
-        loadImage(`https://tiles.maps.eox.at/wmts/1.0.0/${layer}/default/g/${zoom}/${y}/${x}.jpg`).then((img) => {
-          const x0 = ((tileLon(x) - west) / (east - west)) * W;
-          const x1 = ((tileLon(x + 1) - west) / (east - west)) * W;
-          const y0 = ((north - tileLat(y)) / (north - south)) * H;
-          const y1 = ((north - tileLat(y + 1)) / (north - south)) * H;
-          ctx.drawImage(img, x0, y0, x1 - x0 + 0.6, y1 - y0 + 0.6);
-        }),
-      );
-    }
-  }
-  const results = await Promise.allSettled(jobs);
-  const failed = results.filter((r) => r.status === 'rejected').length;
-  if (failed > jobs.length * 0.25) throw new Error('Too many satellite tiles failed to load.');
-  ctx.getImageData(0, 0, 1, 1); // throws here if the server did not allow cross-origin use
-  return canvas;
-}
+  'Sentinel-2 cloudless 2016 by EOX IT Services GmbH (contains modified Copernicus Sentinel data 2016), CC BY 4.0';

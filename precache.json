@@ -1,5 +1,5 @@
 {
-  "version": "76be908987c4",
+  "version": "8606f4464c73",
   "files": [
     "./",
     "index.html",
@@ -15,6 +15,7 @@
     "js/lib/gpx.js",
     "js/lib/sun.js",
     "js/main.js",
+    "js/offline.js",
     "js/store.js",
     "js/terrain/dem.js",
     "js/terrain/paint.js",
@@ -40,6 +41,8 @@
     "assets/fonts/instrument-serif-latin-400-normal.woff2",
     "assets/fonts/instrument-serif-latin-ext-400-italic.woff2",
     "assets/fonts/instrument-serif-latin-ext-400-normal.woff2",
+    "assets/icons/icon-180.png",
+    "assets/icons/icon-512.png",
     "assets/icons/icon.svg",
     "assets/terrain/dem.png"
   ]

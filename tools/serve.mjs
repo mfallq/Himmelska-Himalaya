@@ -33,6 +33,16 @@ http
       res.writeHead(403).end('Forbidden');
       return;
     }
+    // Development only: tools/satellite.html builds the satellite texture in
+    // the browser (which can decode JPEG tiles) and saves it through here.
+    if (req.method === 'PUT' && /^\/assets\/(terrain\/satellite(-small)?\.jpg|icons\/icon-(180|512)\.png)$/.test(url.pathname)) {
+      const chunks = [];
+      req.on('data', (c) => chunks.push(c));
+      req.on('end', () => {
+        fs.writeFile(file, Buffer.concat(chunks), (err) => res.writeHead(err ? 500 : 204).end());
+      });
+      return;
+    }
     fs.readFile(file, (err, data) => {
       if (err) {
         res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Not found');

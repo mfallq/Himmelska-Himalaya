@@ -7,7 +7,7 @@
 export const CREDITS = [
   { what: 'Trail and places', who: '© OpenStreetMap contributors, Open Database Licence', url: 'https://www.openstreetmap.org/copyright', label: 'openstreetmap.org' },
   { what: 'Elevation', who: 'Mapzen Terrain Tiles on AWS Open Data, from SRTM and other public sources', url: 'https://registry.opendata.aws/terrain-tiles/', label: 'terrain tiles' },
-  { what: 'Satellite drape (online only)', who: 'Sentinel-2 cloudless by EOX IT Services GmbH, contains modified Copernicus Sentinel data, CC BY-NC-SA 4.0', url: 'https://s2maps.eu', label: 's2maps.eu' },
+  { what: 'Satellite picture on the relief', who: 'Sentinel-2 cloudless 2016 by EOX IT Services GmbH, contains modified Copernicus Sentinel data 2016, CC BY 4.0', url: 'https://s2maps.eu', label: 's2maps.eu' },
   { what: 'Coastlines on the globe', who: 'Natural Earth, public domain', url: 'https://www.naturalearthdata.com', label: 'naturalearthdata.com' },
   { what: 'Typefaces', who: 'Instrument Serif and Instrument Sans, SIL Open Font Licence 1.1', url: 'https://github.com/Instrument', label: 'Instrument' },
   { what: 'Altitude guidance', who: 'summarised from the CDC Yellow Book and the Wilderness Medical Society guidelines', url: 'https://www.cdc.gov/yellow-book/hcp/environmental-hazards-risks/high-altitude-travel-and-altitude-illness.html', label: 'CDC Yellow Book' },

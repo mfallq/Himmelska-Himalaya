@@ -281,7 +281,7 @@ export class Relief {
 
   // ---------- camera ----------
   /** Move the camera. `view` takes lon/lat (or x/z), az, pitch, dist. */
-  setView(view, { duration = 1400 } = {}) {
+  setView(view, { duration = 2400 } = {}) {
     const to = { ...this.view };
     if (view.lon !== undefined) {
       const [u, v] = this.dem.uv(view.lon, view.lat);
@@ -408,14 +408,23 @@ export class Relief {
         pitch: from.pitch + (to.pitch - from.pitch) * e,
         dist: Math.exp(Math.log(from.dist) + (Math.log(to.dist) - Math.log(from.dist)) * e),
       };
+      // Rise and pull back in mid-flight when the camera travels far, like a crane shot.
+      const travel = Math.hypot(to.x - from.x, to.z - from.z);
+      const lift = Math.sin(Math.PI * t) * clamp(travel / Math.max(from.dist, to.dist), 0, 1);
+      this.view.dist *= 1 + 0.45 * lift;
+      this.view.pitch = clamp(this.view.pitch + 9 * lift, 8, 89);
       moving = true;
       if (t >= 1) {
         this._tween = null;
         this._orbitStart = now;
       }
     } else if (this.orbit && !prefersReducedMotion() && now - this._lastInput > 2600) {
-      // slow sway around the framed direction
-      this.view.az = (this.base.az + 13 * Math.sin((now - this._orbitStart) * 0.00011) + 360) % 360;
+      // A slow drift around the framed direction, with a little breathing in
+      // height and distance so the shot never sits still.
+      const s = (now - this._orbitStart) * 0.001;
+      this.view.az = (this.base.az + 24 * Math.sin(s * 0.075) + 360) % 360;
+      this.view.pitch = clamp(this.base.pitch + 2.5 * Math.sin(s * 0.11 + 1), 8, 89);
+      this.view.dist = this.base.dist * (1 + 0.05 * Math.sin(s * 0.09 + 2));
       moving = true;
     }
     if (moving || this._dirty) this.render();

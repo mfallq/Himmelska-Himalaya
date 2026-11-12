@@ -7,7 +7,9 @@ import crypto from 'node:crypto';
 import { ROOT } from './config.mjs';
 
 const INCLUDE = ['index.html', 'manifest.webmanifest', 'css', 'js', 'data', 'assets'];
-const SKIP = /\.(txt|md)$/i;
+// The two satellite pictures are large and a device only needs one of them:
+// the service worker keeps whichever one the page actually loads.
+const SKIP = /\.(txt|md)$|satellite(-small)?\.jpg$/i;
 
 async function walk(rel, out) {
   const abs = path.join(ROOT, rel);

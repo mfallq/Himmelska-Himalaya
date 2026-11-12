@@ -17,7 +17,7 @@ export const BBOX = { west: 83.36, south: 28.1, east: 84.7, north: 28.95 };
 export const OSM_BBOX = { west: 83.45, south: 28.1, east: 84.6, north: 28.95 };
 
 /** Elevation grid written to assets/terrain/dem.png. */
-export const DEM = { width: 576, height: 0, zoom: 11, step: 4 };
+export const DEM = { width: 1024, height: 0, zoom: 12, step: 4 };
 
 /** OpenStreetMap relation for the Annapurna Circuit hiking route. */
 export const ROUTE_RELATION = 1187310;

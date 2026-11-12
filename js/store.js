@@ -6,7 +6,7 @@ const defaults = {
   settings: { startDate: '', theme: 'auto', home: '' },
   checks: {}, // checklist item id -> true
   journal: {}, // day number -> { note, check: { headache, stomach, fatigue, dizzy } }
-  relief: { exaggeration: 1.4, mode: 'cinema', labels: true, satellite: false, orbit: true },
+  relief: { exaggeration: 1.4, mode: 'cinema', labels: true, photo: true, orbit: true },
 };
 
 function load() {

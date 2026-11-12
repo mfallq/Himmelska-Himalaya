@@ -41,7 +41,13 @@ The site is live at `expandialabs.com/himmelska-himalaya/`. That repository hold
 node tools/publish.mjs ../expandialabs/site/himmelska-himalaya
 ```
 
-The copy includes `deploy/htaccess` as `.htaccess`, which relaxes two rules inherited from the main site: it allows the satellite tile server in the Content-Security-Policy, and it stops CSS and JS being cached for a year.
+The copy includes `deploy/htaccess` as `.htaccess`, which stops CSS and JS being cached for a year, a rule inherited from the main site.
+
+## On a phone, without signal
+
+The site saves a full copy of itself on the device the first time it is opened with a connection (about 2 MB on a phone). After that every request is answered from that copy, so it opens with no signal. The header shows "Offline: ready" only when every file has been checked as saved.
+
+On an iPhone, open the site in Safari and use Share → Add to Home Screen. iOS can delete the saved copy of a website that has not been opened for a week; a Home Screen app is kept. Open it once from the Home Screen while still connected, then test it in flight mode before leaving.
 
 ## Where things live
 
@@ -71,7 +77,7 @@ node tools/build-precache.mjs   # offline file list
 
 - Trail, places and services: © OpenStreetMap contributors, Open Database Licence (ODbL).
 - Elevation: Mapzen Terrain Tiles on AWS Open Data (SRTM and other public sources).
-- Satellite drape (loaded online only, never stored in this repo): Sentinel-2 cloudless by EOX IT Services GmbH, CC BY-NC-SA 4.0.
+- Satellite picture (`assets/terrain/satellite.jpg`, built by `tools/satellite.html`): Sentinel-2 cloudless 2016 by EOX IT Services GmbH, contains modified Copernicus Sentinel data 2016, CC BY 4.0. The 2016 layer is used on purpose: later years are CC BY-NC-SA and not free for commercial sites.
 - Globe coastlines: Natural Earth, public domain.
 - Fonts: Instrument Serif and Instrument Sans, SIL Open Font Licence 1.1 (licence texts in `assets/fonts/`).
 

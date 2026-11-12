@@ -52,7 +52,7 @@ function render(n) {
         </dl>
         <figure class="viewfig">
           <canvas width="1260" height="540" id="sheet-still" role="img" aria-label="Relief view of the day’s route"></canvas>
-          <figcaption><b>${d.place}</b>The day on the relief, looking ${facing(d.cam.az)}. The bright line is today’s stage. Drawn from elevation data, not a photograph.</figcaption>
+          <figcaption><b>${d.place}</b>The day on the relief, looking ${facing(d.cam.az)}. The bright line is today’s stage. An elevation model under a satellite picture from 2016, not a view from the trail.</figcaption>
         </figure>
         <p style="max-width:76ch">${x.summary || d.text}</p>
         <div class="chips">${stops.map((id) => html`<span class="chip">${STOPS[id].name} · ${metres(STOPS[id].ele)}</span>`)}</div>

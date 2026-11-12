@@ -18,7 +18,13 @@ if (target === ROOT || ROOT.startsWith(target + path.sep) || target.startsWith(R
 }
 
 const manifest = JSON.parse(await fs.readFile(path.join(ROOT, 'precache.json'), 'utf8'));
-const files = [...manifest.files.filter((f) => f !== './'), 'sw.js', 'precache.json'];
+const files = [
+  ...manifest.files.filter((f) => f !== './'),
+  'sw.js',
+  'precache.json',
+  'assets/terrain/satellite.jpg',
+  'assets/terrain/satellite-small.jpg',
+];
 const MARKER = '.published-from-himmelska-himalaya';
 
 // Only clear a folder this script created.

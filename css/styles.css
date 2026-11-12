@@ -178,6 +178,7 @@ button { cursor: pointer; }
 }
 .topbtn:hover { color: var(--fg); border-color: var(--line); }
 .topbtn.is-accent { color: var(--accent); }
+.topbtn .short { display: none; }
 .topbtn .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--fg-3); }
 .topbtn .dot.ok { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 22%, transparent); }
 .topbtn .dot.off { background: var(--warn); }
@@ -575,6 +576,7 @@ dialog::backdrop { background: rgba(4, 8, 11, .68); backdrop-filter: blur(3px); 
   .daygrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .grid.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .topbtn .long { display: none; }
+  .topbtn .short { display: inline; }
 }
 @media (max-width: 760px) {
   :root { --topbar-h: 56px; }
@@ -618,4 +620,61 @@ dialog::backdrop { background: rgba(4, 8, 11, .68); backdrop-filter: blur(3px); 
   .topbar, .tabbar, .hero canvas, #toast { display: none !important; }
   body { background: #fff; color: #000; padding: 0; }
   main { padding: 0; }
+}
+
+/* ---------- 9. Phones and the Home Screen app ---------- */
+:root { --safe-top: env(safe-area-inset-top, 0px); }
+html { -webkit-tap-highlight-color: transparent; }
+.topbar { height: calc(var(--topbar-h) + var(--safe-top)); padding-top: var(--safe-top); }
+main { padding-top: calc(var(--topbar-h) + var(--safe-top)); }
+.sheet-body, .modal[open] { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+.sheet-body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+
+@media (max-width: 760px) {
+  .topbar { gap: 8px; padding-left: 14px; padding-right: 8px; }
+  .brand { letter-spacing: .16em; font-size: 11px; gap: 9px; }
+  .brand svg { width: 26px; }
+  .topbar-actions { gap: 0; }
+  .topbtn { height: 40px; padding: 0 8px; font-size: 10.5px; letter-spacing: .08em; }
+  /* iOS zooms the page when a focused field is smaller than 16px */
+  .field, select.field, textarea.field, input.field { font-size: 16px; }
+  .hero canvas.gl, .hero .hero-shade, .labels { height: 52svh; min-height: 320px; }
+  .hero-copy { margin-top: -34px; }
+  .hero-copy .display { font-size: clamp(40px, 12vw, 54px); }
+  .display { font-size: clamp(38px, 11.5vw, 54px); }
+  .daychip { top: 12px; left: 12px; padding: 9px 12px; }
+  .hero-ui { padding: 0 16px 26px; }
+  .daypanel { padding: 16px; }
+  .daypanel .linkbtn, .linkbtn { min-height: 40px; }
+  .pill { height: 44px; }
+  .pill.icon { width: 44px; }
+  .modes button { padding: 14px 12px; white-space: nowrap; }
+  .legs div { padding-right: 26px; }
+  .legs b { font-size: 18px; }
+  .flightcard { border-radius: 12px; }
+  .stats { flex-wrap: wrap; row-gap: 14px; }
+  .toolbar { gap: 12px; }
+  .subtabs { flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding-inline: 16px; scrollbar-width: none; }
+  .subtabs button { flex: none; min-height: 44px; }
+  .cats { flex-wrap: nowrap; overflow-x: auto; margin-inline: -16px; padding-inline: 16px; scrollbar-width: none; }
+  .cat { flex: none; min-height: 44px; }
+  .mapwrap canvas { height: 62svh; }
+  .check { padding: 16px 0; }
+  .check input { width: 26px; height: 26px; }
+  .kv { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .viewfig canvas { aspect-ratio: 16 / 10; }
+  .modal[open] { padding: 22px 20px calc(22px + env(safe-area-inset-bottom, 0px)); }
+  .chart svg { min-width: 560px; }
+  .chart { overflow-x: auto; }
+  #toast { bottom: calc(var(--tabbar-h) + 26px + env(safe-area-inset-bottom)); }
+}
+/* Running from the Home Screen: nothing to scroll sideways, no rubber band. */
+@media (display-mode: standalone) {
+  body { overscroll-behavior-y: none; -webkit-user-select: none; user-select: none; }
+  input, textarea, p, li, dd, h1, h2, h3, h4 { -webkit-user-select: text; user-select: text; }
+}
+@media (max-width: 760px) {
+  /* The floating Close button squeezed the text column on phones. */
+  .sheet-close { float: none; display: flex; margin: 0 16px 0 auto; }
+  .sheet-title { max-width: none; }
 }

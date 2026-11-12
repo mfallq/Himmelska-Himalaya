@@ -1,7 +1,8 @@
 // Boot: load the data, wire the header and tabs, and show the view in the URL.
 import { loadData, TRIP } from './data.js';
 import { store } from './store.js';
-import { initShell, setOfflineReady } from './ui/shell.js';
+import { initShell, setOffline } from './ui/shell.js';
+import { start as startOffline } from './offline.js';
 import { $, $$ } from './util.js';
 import { openDay } from './views/daysheet.js';
 
@@ -50,15 +51,7 @@ async function boot() {
   addEventListener('hashchange', route);
   route();
 
-  if ('serviceWorker' in navigator) {
-    try {
-      await navigator.serviceWorker.register('sw.js');
-      await navigator.serviceWorker.ready;
-      setOfflineReady(true);
-    } catch {
-      setOfflineReady(false);
-    }
-  }
+  startOffline(setOffline);
 }
 
 boot();

@@ -3,6 +3,7 @@ import { $, html, toast, dateShort, dateLong, addDays, parseISO, download } from
 import { store } from '../store.js';
 import { TRIP } from '../data.js';
 import { CREDITS } from '../content/guide.js';
+import { saveAll, isIOS, installed } from '../offline.js';
 
 export function openModal(content) {
   const m = $('#modal');
@@ -22,9 +23,10 @@ function applyTheme() {
 
 function applyDates() {
   const start = parseISO(store.state.settings.startDate);
+  const narrow = matchMedia('(max-width: 760px)').matches;
   $('#dates-label').textContent = start
-    ? `${dateShort(start)} – ${dateShort(addDays(start, TRIP.days - 1))}`
-    : 'Set your dates';
+    ? narrow ? dateShort(start) : `${dateShort(start)} – ${dateShort(addDays(start, TRIP.days - 1))}`
+    : narrow ? 'Dates' : 'Set your dates';
 }
 
 function datesDialog() {
@@ -60,33 +62,55 @@ function datesDialog() {
 }
 
 // ---------- offline status ----------
-const offline = { ready: false };
+let offline = { supported: true, total: 0, saved: 0, missing: [] };
+const offlineReady = () => offline.supported && offline.total > 0 && !offline.missing.length;
 function applyOffline() {
   const dot = $('#offline-dot'), label = $('#offline-label');
   const online = navigator.onLine;
-  dot.className = 'dot ' + (offline.ready ? 'ok' : online ? '' : 'off');
-  label.textContent = offline.ready ? (online ? 'Offline: ready' : 'Offline: in use') : online ? 'Offline: not saved yet' : 'No connection';
+  const ready = offlineReady();
+  dot.className = 'dot ' + (ready ? 'ok' : online ? '' : 'off');
+  label.textContent = ready
+    ? online ? 'Offline: ready' : 'Offline: in use'
+    : !offline.supported ? 'Offline: unavailable'
+    : offline.total ? `Saving ${offline.saved}/${offline.total}`
+    : online ? 'Offline: not saved yet' : 'No connection';
 }
-export function setOfflineReady(ready) {
-  offline.ready = ready;
+export function setOffline(state) {
+  offline = state;
   applyOffline();
 }
 
 function offlineDialog() {
-  openModal(html`
+  const ready = offlineReady();
+  const m = openModal(html`
     <div class="stack">
       <p class="eyebrow">Without signal</p>
-      <h2 class="h2" id="modal-title">${offline.ready ? 'Saved for the trail.' : 'Not saved on this device yet.'}</h2>
-      <p class="muted">${offline.ready
-        ? 'This device holds a copy of the site. Open it from a bookmark or your home screen and it loads with no connection.'
-        : 'Load the site once with a connection and it keeps a copy for later. Some browsers need a second visit, and private windows keep nothing.'}</p>
+      <h2 class="h2" id="modal-title">${ready ? 'Saved for the trail.' : offline.supported ? 'Not fully saved yet.' : 'This browser cannot save the site.'}</h2>
+      <p class="muted" id="off-state">${ready
+        ? `All ${offline.total} files are on this device. The whole site, including the 3D relief and the satellite picture, opens with no connection.`
+        : offline.supported
+          ? `${offline.saved} of ${offline.total || '?'} files are saved. Stay connected and press the button to fetch the rest.`
+          : 'Private windows and some in-app browsers keep nothing. Open the site in Safari or Chrome itself.'}</p>
+      ${offline.supported ? html`<div><button class="btn btn-primary" type="button" id="off-save">${ready ? 'Check and refresh the copy' : 'Save everything now'}</button></div>` : ''}
+      ${isIOS() && !installed() ? html`<div class="card callout"><h3 class="h4">On an iPhone: add it to the Home Screen</h3><p class="small muted">In Safari, tap Share, then “Add to Home Screen”. iOS may delete the saved copy of a website you have not opened for a week. A Home Screen app is kept, opens full screen, and holds your journal safely. Open it once from the Home Screen while you still have a connection.</p></div>` : ''}
       <ul class="bullets">
-        <li><b>Works offline:</b> the 3D relief and the route, every day and its guidance, the altitude chart, the checklist and your journal.</li>
-        <li><b>Needs a connection:</b> the satellite drape on the relief. Once loaded, the imagery you have seen is kept on the device.</li>
-        <li><b>Stays on this device:</b> your dates, ticks and journal. Export a backup from “About & sources” before you change phone.</li>
+        <li><b>Works offline:</b> everything. The relief and route, every day, the altitude charts, the field map, the checklist and your journal.</li>
+        <li><b>Needs a connection:</b> only the links to outside sources.</li>
+        <li><b>Before you leave:</b> switch on flight mode and open each tab once, to see for yourself that it works.</li>
+        <li><b>Stays on this device:</b> your dates, ticks and journal. Export a backup from “About & sources” now and then.</li>
       </ul>
-      <div class="actions"><button class="btn btn-primary" type="button" data-close>Close</button></div>
+      <div class="actions"><button class="btn" type="button" data-close>Close</button></div>
     </div>`);
+  $('#off-save', m)?.addEventListener('click', async (e) => {
+    if (!navigator.onLine) return toast('No connection right now. Try again when you have signal.');
+    e.target.disabled = true;
+    const state = await saveAll((saved, total) => ($('#off-state', m).textContent = `Saving… ${saved} of ${total} files.`));
+    setOffline(state);
+    $('#off-state', m).textContent = state.missing.length
+      ? `${state.saved} of ${state.total} files saved. ${state.missing.length} could not be fetched: try again with a better connection.`
+      : `All ${state.total} files are on this device.`;
+    e.target.disabled = false;
+  });
 }
 
 function aboutDialog() {

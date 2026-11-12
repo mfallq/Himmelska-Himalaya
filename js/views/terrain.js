@@ -3,8 +3,7 @@ import { html, $, $$, metres, dateShort, toast, bearing, clamp, pad2 } from '../
 import { store } from '../store.js';
 import { data, DAYS, TRIP, STOPS, PEAKS, day as dayOf, stopsOf, dateOf, walked, trackAt } from '../data.js';
 import { KINDS } from '../content/itinerary.js';
-import { getScene, repaint, setSatellite, cameraOf } from '../terrain/scene.js';
-import { SATELLITE_CREDIT } from '../terrain/paint.js';
+import { getScene, repaint, cameraOf, usesPhoto } from '../terrain/scene.js';
 import { openDay } from './daysheet.js';
 
 const OVERNIGHT = new Set(DAYS.map((d) => d.to));
@@ -43,7 +42,7 @@ function template() {
             <button type="button" data-mode="cinema">Cinema</button>
             <button type="button" data-mode="atlas">Atlas</button>
             <button type="button" data-toggle="labels">Landmarks</button>
-            <button type="button" class="sat" data-toggle="satellite">Satellite online</button>
+            <button type="button" class="sat" data-toggle="satellite">Satellite</button>
           </div>
           <div class="altbox"><b class="num" id="t-alt"></b><span>metres / sleeping altitude</span></div>
         </div>
@@ -76,8 +75,8 @@ function template() {
         </div>
         <p class="small faint" style="margin-top:34px;max-width:86ch">
           Places and the trail come from OpenStreetMap; expect the line to be within a few hundred metres of where you actually walk.
-          The relief is an elevation model (Mapzen terrain tiles, about 230 m per cell) with a stylised ground cover painted from
-          height and steepness. The light is cinematic: it is not the weather and not a computed sunrise.
+          The relief is an elevation model (Mapzen terrain tiles, about 130 m per cell) draped with a cloud-free satellite picture
+          from 2016, so snow and vegetation are not today’s. The light is cinematic: it is not the weather and not a computed sunrise.
         </p>
       </section>
       <section class="section" id="field" hidden></section>
@@ -160,7 +159,9 @@ export async function mount(root) {
     const r = store.state.relief;
     const wide = r.mode === 'atlas' || relief.view.dist > 95;
     const dayStops = new Set(stopsOf(n));
-    const placed = [];
+    // Keep labels out from under the day chip in the corner.
+    const box = labelsEl.getBoundingClientRect(), chip = $('.daychip', root).getBoundingClientRect();
+    const placed = [{ x: chip.left - box.left, y: chip.top - box.top, w: chip.width, h: chip.height }];
     for (const m of markers) {
       if (m.kind === 'stop') {
         const ends = m.id === d.from || m.id === d.to;
@@ -208,14 +209,15 @@ export async function mount(root) {
     $('#t-exag', root).value = String(r.exaggeration);
     $$('[data-mode]', root).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === r.mode)));
     $('[data-toggle="labels"]', root).setAttribute('aria-pressed', String(r.labels));
-    $('[data-toggle="satellite"]', root).setAttribute('aria-pressed', String(r.satellite));
+    const photo = scene ? usesPhoto(scene) : r.photo !== false;
+    $('[data-toggle="satellite"]', root).setAttribute('aria-pressed', String(photo));
     $('#t-orbit', root).setAttribute('aria-pressed', String(r.orbit));
-    $('#t-credit', root).textContent = r.satellite
-      ? `Satellite drape · ${SATELLITE_CREDIT} · vertical ×${r.exaggeration}`
-      : `Offline relief · stylised ground cover · vertical ×${r.exaggeration}`;
+    $('#t-credit', root).textContent = photo
+      ? `Offline relief · Sentinel-2 cloudless 2016, EOX, CC BY 4.0 · vertical ×${r.exaggeration}`
+      : `Offline relief · painted ground cover · vertical ×${r.exaggeration}`;
   }
 
-  function frame(n, duration = 1500) {
+  function frame(n, duration = 2600) {
     if (!scene) return;
     const cam = cameraOf(n);
     if (store.state.relief.mode === 'atlas') scene.relief.setView({ ...cam, az: 0, pitch: 80, dist: cam.dist * 1.25 }, { duration });
@@ -248,7 +250,7 @@ export async function mount(root) {
     scene.relief.driver = (now) => {
       const dt = Math.min(0.1, (now - flying.last) / 1000);
       flying.last = now;
-      flying.km += dt * 2.4; // km of trail per second
+      flying.km += dt * 1.5; // km of trail per second
       if (flying.km >= data.trackKm) {
         stopFlight();
         return true;
@@ -261,8 +263,8 @@ export async function mount(root) {
       v.x = (u - 0.5) * scene.dem.widthKm;
       v.z = (vv - 0.5) * scene.dem.heightKm;
       v.az = (flying.az + 360) % 360;
-      v.pitch += (30 - v.pitch) * Math.min(1, dt * 1.5);
-      v.dist += (19 - v.dist) * Math.min(1, dt * 1.2);
+      v.pitch += (24 - v.pitch) * Math.min(1, dt * 1.5);
+      v.dist += (13 - v.dist) * Math.min(1, dt * 1.2);
       if (here.day !== store.state.day) store.set('day', here.day);
       return true;
     };
@@ -277,7 +279,10 @@ export async function mount(root) {
       store.set('relief', { mode: t.dataset.mode });
       frame(store.state.day, 1100);
     } else if (t.dataset.toggle === 'labels') store.set('relief', { labels: !store.state.relief.labels });
-    else if (t.dataset.toggle === 'satellite') toggleSatellite(t);
+    else if (t.dataset.toggle === 'satellite') {
+      if (scene && !scene.photo) toast('The satellite picture could not be loaded. Showing the painted relief.');
+      else store.set('relief', { photo: store.state.relief.photo === false });
+    }
     else if (t.id === 't-orbit') store.set('relief', { orbit: !store.state.relief.orbit });
     else if (t.id === 't-haze') {
       const on = t.getAttribute('aria-pressed') !== 'true';
@@ -293,21 +298,6 @@ export async function mount(root) {
     } else if (t.id === 't-open') openDay(store.state.day);
   });
 
-  async function toggleSatellite(button) {
-    if (!scene) return;
-    const on = !store.state.relief.satellite;
-    if (on && !navigator.onLine) return toast('Satellite imagery needs a connection. The offline relief stays on.');
-    button.textContent = on ? 'Loading imagery…' : 'Satellite online';
-    try {
-      await setSatellite(scene, on);
-      store.set('relief', { satellite: on });
-    } catch (err) {
-      toast(err.message || 'Satellite imagery could not be loaded.');
-      store.set('relief', { satellite: false });
-    }
-    button.textContent = 'Satellite online';
-  }
-
   $('#t-slider', root).addEventListener('input', (e) => {
     stopFlight();
     store.set('day', Number(e.target.value));
@@ -321,8 +311,13 @@ export async function mount(root) {
     if (!scene) return;
     scene.relief.setExaggeration(r.exaggeration);
     scene.relief.orbit = r.orbit;
+    if (usesPhoto(scene) !== shownPhoto) {
+      shownPhoto = usesPhoto(scene);
+      repaint(scene, store.state.day);
+    }
     scene.relief.invalidate();
   });
+  let shownPhoto = store.state.relief.photo !== false;
 
   syncControls();
   renderDay(store.state.day);
@@ -334,7 +329,7 @@ export async function mount(root) {
     scene.relief.onFrame = placeLabels;
     scene.canvas.addEventListener('pointerdown', stopFlight);
     renderDay(store.state.day);
-    if (store.state.relief.satellite && navigator.onLine) setSatellite(scene, true).catch(() => store.set('relief', { satellite: false }));
+    syncControls();
     frame(store.state.day, 0);
     // The field file is heavy to build, so it waits until it is nearly on screen.
     const field = $('#field', root);

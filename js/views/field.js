@@ -285,7 +285,7 @@ export async function mountField(root) {
     </div></details>`;
 
   const [scene, pois] = await Promise.all([getScene(), loadPois()]);
-  const base = paintLandcover(scene.dem, 2, { shaded: true });
+  const base = paintLandcover(scene.dem, 1.25, { shaded: true });
   const map = new FieldMap($('#f-map', root), scene.dem, base);
   map.categories = pois.categories;
   $('#f-date', root).textContent = pois.extracted ? `extracted ${pois.extracted}` : '';
